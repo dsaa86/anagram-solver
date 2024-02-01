@@ -1,4 +1,3 @@
-import math
 from imaplib import Int2AP
 from operator import indexOf
 
