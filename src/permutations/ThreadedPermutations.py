@@ -1,8 +1,8 @@
+from operator import ge
 from pdb import run
 from threading import Thread
 from itertools import permutations
 from CalculatedPermutationsException import CalculatedPermutationsException, ExceededPermittedPermutationCountException
-import time
 
 """
 
@@ -41,15 +41,13 @@ import time
 
 """
 
-
-
-
 class ThreadedPermutations(Thread):
     def __init__(self, data_set: list, prefix: str):
         Thread.__init__(self)
         self.data_set = data_set
         self.prefix = prefix
         self.result = []
+
 
     def run(self):
         permutations_list = list(permutations(self.data_set))
