@@ -158,8 +158,6 @@ class AnagramSolver:
         
         prepared_pattern = preparePattern(pattern)
 
-        print(prepared_pattern)
-
         pattern_matches = []
 
         for permutation in valid_permutations_list:
@@ -169,12 +167,58 @@ class AnagramSolver:
         return pattern_matches
 
 from math import factorial
+import time
 
 length = len("getbargee")
 
 print(factorial(length) / factorial((length - length)))
 
 
-solver = AnagramSolver(anagram="getbargee", local = True)
+solver = AnagramSolver(anagram="ge", local = True)
+start_time = time.time()
 solver.generatePermutations()
-print(solver.searchLocalWithPattern(pattern="-g-----e-"))
+end_time = time.time()
+print(f"Time taken: {end_time - start_time}")
+solver = None
+solver = AnagramSolver(anagram="get", local = True)
+start_time = time.time()
+solver.generatePermutations()
+end_time = time.time()
+print(f"Time taken: {end_time - start_time}")
+solver = None
+solver = AnagramSolver(anagram="getb", local = True)
+start_time = time.time()
+solver.generatePermutations()
+end_time = time.time()
+print(f"Time taken: {end_time - start_time}")
+solver = None
+solver = AnagramSolver(anagram="getba", local = True)
+start_time = time.time()
+solver.generatePermutations()
+end_time = time.time()
+print(f"Time taken: {end_time - start_time}")
+solver = None
+solver = AnagramSolver(anagram="getbar", local = True)
+start_time = time.time()
+solver.generatePermutations()
+end_time = time.time()
+print(f"Time taken: {end_time - start_time}")
+solver = None
+solver = AnagramSolver(anagram="getbarg", local = True)
+start_time = time.time()
+solver.generatePermutations()
+end_time = time.time()
+print(f"Time taken: {end_time - start_time}")
+solver = None
+solver = AnagramSolver(anagram="getbarge", local = True)
+start_time = time.time()
+solver.generatePermutations()
+end_time = time.time()
+print(f"Time taken: {end_time - start_time}")
+solver = None
+solver = AnagramSolver(anagram="getbargee", local = True)
+start_time = time.time()
+solver.generatePermutations()
+end_time = time.time()
+print(f"Time taken: {end_time - start_time}")
+solver = None

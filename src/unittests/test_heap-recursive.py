@@ -11,6 +11,10 @@ def test_empty_input():
     with pytest.raises(Exception) as e_info:
         HeapRecursive.heapRecursive([])
 
+def test_input_size_eight():
+    with pytest.raises(Exception) as e_info:
+        HeapRecursive.heapRecursive(["A", "B", "C", "D", "E", "F", "G", "H"])
+
 def test_input_size_three():
     result = HeapRecursive.heapRecursive(["A", "B", "C"])
     assert result == ['ABC', 'BAC', 'CAB', 'ACB', 'BCA', 'CBA']

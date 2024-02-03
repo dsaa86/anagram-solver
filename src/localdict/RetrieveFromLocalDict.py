@@ -11,3 +11,5 @@ class RetrieveFromLocalDict:
 
     def retrieveFromLocalDict(self, word):
         return True if word in self.dictionary_of_english_words else False
+    
+    
