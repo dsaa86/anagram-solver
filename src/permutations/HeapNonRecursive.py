@@ -1,6 +1,7 @@
 from CalculatedPermutationsException import CalculatedPermutationsException, ExceededPermittedPermutationCountException
 
-import re
+from HelperFunctions import checkInputListCharValidity
+
 
 mapped_char_to_int = {
     "a" : 0,
@@ -81,20 +82,7 @@ def heapNonRecursive(input_list: list, output_list: list = None, perm_size : int
     if len(input_list) > 7 and not threaded:
         raise ExceededPermittedPermutationCountException()
     
-    char_only = False
-    digit_only = False
-    spec_char_presence = False
-
-    for x in input_list:
-        x = str(x)
-        if re.search(r'[^a-z]', x) is None:
-            char_only = True
-        elif re.search(r'[^0-9]', x) is None:
-            print("digit only")
-            digit_only = True
-        elif re.search(r'[^a-z0-9]', x) is not None:
-            print("spec char")
-            spec_char_presence = True
+    char_only, digit_only, spec_char_presence = checkInputListCharValidity(input_list)
 
     if spec_char_presence:
         raise ValueError("Special characters not permitted in input list")
@@ -142,10 +130,10 @@ def heapNonRecursive(input_list: list, output_list: list = None, perm_size : int
     return output_list
 
 
-data = ["a", "b", "c", "d", "e", "f", "g"]
+data = ["a", "b", "c", "d", "e", "f", "/"]
 results = heapNonRecursive(data)
 
-# for result in results:
-#     print(result)
+for result in results:
+    print(result)
 
 print(len(results))
