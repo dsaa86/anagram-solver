@@ -1,6 +1,3 @@
-from multiprocessing import heap
-from operator import ge
-from pdb import run
 from threading import Thread
 from itertools import permutations
 from HeapRecursive import heapRecursive
