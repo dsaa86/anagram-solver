@@ -1,5 +1,7 @@
 from CalculatedPermutationsException import CalculatedPermutationsException, ExceededPermittedPermutationCountException
 
+import re
+
 mapped_char_to_int = {
     "a" : 0,
     "b" : 1,
@@ -72,12 +74,33 @@ def swap(input_list: list, index1: int, index2: int):
     return input_list
 
 
-def heapNonRecursive(input_list: list, output_list: list = [], perm_size : int = None, threaded: bool = False):
+def heapNonRecursive(input_list: list, output_list: list = None, perm_size : int = None, threaded: bool = False):
     if not input_list:
         raise CalculatedPermutationsException("Empty input list")
     
     if len(input_list) > 7 and not threaded:
         raise ExceededPermittedPermutationCountException()
+    
+    char_only = False
+    digit_only = False
+    spec_char_presence = False
+
+    for x in input_list:
+        x = str(x)
+        if re.search(r'[^a-z]', x) is None:
+            char_only = True
+        elif re.search(r'[^0-9]', x) is None:
+            print("digit only")
+            digit_only = True
+        elif re.search(r'[^a-z0-9]', x) is not None:
+            print("spec char")
+            spec_char_presence = True
+
+    if spec_char_presence:
+        raise ValueError("Special characters not permitted in input list")
+    
+    if char_only and digit_only:
+        raise ValueError("Input list can only contain one data type: char OR int, not both")
     
     if perm_size is None:
         perm_size = len(input_list)
@@ -86,42 +109,35 @@ def heapNonRecursive(input_list: list, output_list: list = [], perm_size : int =
         output_list.append(input_list.copy())
         return output_list
     
-    int_mapped_input_list = [mapCharToInt(char) for char in input_list]
-    c = [0] * perm_size
+    if output_list is None:
+        output_list = []
+    
+    int_mapped_input_list = input_list if digit_only else [mapCharToInt(char) for char in input_list]
 
-    i = 1
+    check_list = [0] * perm_size
+    iterator_count = 1
 
-    while i < perm_size:
-        if c[i] < i:
-            if i % 2 == 0:
-                # int_mapped_input_list = swap(int_mapped_input_list, 0, i)
-                # temp = input_list[0]
-                # input_list[0] = input_list[i]
-                # input_list[i] = temp
-                temp = int_mapped_input_list[0]
-                int_mapped_input_list[0] = int_mapped_input_list[i]
-                int_mapped_input_list[i] = temp
+    while iterator_count < perm_size:
+        if check_list[iterator_count] < iterator_count:
+            if iterator_count % 2 == 0:
+                int_mapped_input_list = swap(int_mapped_input_list, 0, iterator_count)
+
             else:
-                # int_mapped_input_list = swap(int_mapped_input_list, c[i], i)
-                # temp = input_list[c[i]]
-                # input_list[c[i]] = input_list[i]
-                # input_list[i] = temp
-                temp = int_mapped_input_list[c[i]]
-                int_mapped_input_list[c[i]] = int_mapped_input_list[i]
-                int_mapped_input_list[i] = temp
+                int_mapped_input_list = swap(int_mapped_input_list, check_list[iterator_count], iterator_count)
 
-            # print(int_mapped_input_list)
-            # output_list.append(input_list.copy())
             output_list.append(int_mapped_input_list.copy())
-            c[i] += 1
-            i = 1
+            check_list[iterator_count] += 1
+            iterator_count = 1
         else:
-            c[i] = 0
-            i += 1
+            check_list[iterator_count] = 0
+            iterator_count += 1
 
-    for index, elem in enumerate(output_list):
-        output_list[index] = "".join([mapIntToChar(int) for int in elem])
-    output_list.append("".join(input_list))
+    if char_only:
+        for index, elem in enumerate(output_list):
+            output_list[index] = "".join([mapIntToChar(int) for int in elem])
+        output_list.append("".join(input_list))
+    else:
+        output_list.append(int_mapped_input_list)
 
     return output_list
 
@@ -129,7 +145,7 @@ def heapNonRecursive(input_list: list, output_list: list = [], perm_size : int =
 data = ["a", "b", "c", "d", "e", "f", "g"]
 results = heapNonRecursive(data)
 
-for result in results:
-    print(result)
+# for result in results:
+#     print(result)
 
 print(len(results))
