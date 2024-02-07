@@ -28,7 +28,7 @@ class ThreadedHeapRecursivePermutations(ThreadedPermutations):
         ThreadedPermutations.__init__(self, data_set, prefix)
 
     def run(self):
-        permutations_list = heapRecursive(self.data_set)
+        permutations_list = heapRecursive(self.data_set, threaded = True)
         
         for index, permutation in enumerate(permutations_list):
             permutations_list[index] = self.prefix + permutation
