@@ -64,6 +64,13 @@ def mapCharToInt(char: str) -> int:
 def mapIntToChar(int: int) -> str:
     return mapped_int_to_char[int]
 
+def swap(input_list: list, index1: int, index2: int):
+    temp = input_list[index1]
+    input_list[index1] = input_list[index2]
+    input_list[index2] = temp
+
+    return input_list
+
 
 def heapNonRecursive(input_list: list, output_list: list = [], perm_size : int = None, threaded: bool = False):
     if not input_list:
@@ -87,16 +94,25 @@ def heapNonRecursive(input_list: list, output_list: list = [], perm_size : int =
     while i < perm_size:
         if c[i] < i:
             if i % 2 == 0:
+                # int_mapped_input_list = swap(int_mapped_input_list, 0, i)
+                # temp = input_list[0]
+                # input_list[0] = input_list[i]
+                # input_list[i] = temp
                 temp = int_mapped_input_list[0]
                 int_mapped_input_list[0] = int_mapped_input_list[i]
                 int_mapped_input_list[i] = temp
             else:
+                # int_mapped_input_list = swap(int_mapped_input_list, c[i], i)
+                # temp = input_list[c[i]]
+                # input_list[c[i]] = input_list[i]
+                # input_list[i] = temp
                 temp = int_mapped_input_list[c[i]]
                 int_mapped_input_list[c[i]] = int_mapped_input_list[i]
                 int_mapped_input_list[i] = temp
 
             # print(int_mapped_input_list)
-            output_list.append(int_mapped_input_list)
+            # output_list.append(input_list.copy())
+            output_list.append(int_mapped_input_list.copy())
             c[i] += 1
             i = 1
         else:
@@ -108,3 +124,12 @@ def heapNonRecursive(input_list: list, output_list: list = [], perm_size : int =
     output_list.append("".join(input_list))
 
     return output_list
+
+
+data = ["a", "b", "c", "d", "e", "f", "g"]
+results = heapNonRecursive(data)
+
+for result in results:
+    print(result)
+
+print(len(results))
