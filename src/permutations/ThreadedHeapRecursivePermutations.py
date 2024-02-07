@@ -1,10 +1,10 @@
 from CalculatedPermutationsException import CalculatedPermutationsException, ExceededPermittedPermutationCountException
-import ThreadedStandardPermutations
+import ThreadedHeapRecursivePermutations
 
 """
 
     We generate permutations using a threaded approach.
-    The algorithm used to generate permutations is the native itertools.permutations
+    The algorithm used to generate permutations is Heap's algorithm in recursive format.
     This permits a faster generation of permutations at the expense
     of system resources.
 
@@ -67,7 +67,7 @@ def generatePermutationsThreaded(input_list: list, output_list = None, perm_size
     threads = []
 
     for data in data_for_threading:
-        thread = ThreadedStandardPermutations(data[0], data[1])
+        thread = ThreadedHeapRecursivePermutations(data[0], data[1])
         threads.append(thread)
 
     for thread in threads:
