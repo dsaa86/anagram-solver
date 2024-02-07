@@ -7,6 +7,9 @@ import RetrieveFromLocalDict
 class GenerateCharCountDict:
     def __init__(self, generate = False, read = False):
 
+        if not generate and not read:
+            raise ValueError("At least one of the optional arguments must be True")
+
         if generate:
             local_dict = RetrieveFromLocalDict.RetrieveFromLocalDict(path = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/localdict/")
             self.generateCharCountDictionaryFile(local_dict)
