@@ -1,5 +1,5 @@
-from CalculatedPermutationsException import CalculatedPermutationsException, ExceededPermittedPermutationCountException
-import ThreadedHeapNonRecursivePermutations
+from ThreadedPermutationsClass import HeapNonRecursivePermutationsThread
+from PermutationsThreadedBaseClass import PermutationsThreadedBaseClass
 
 """
 
@@ -39,44 +39,26 @@ import ThreadedHeapNonRecursivePermutations
 
 """
 
+class PermutationsThreadedHeapNonRecursiveClass(PermutationsThreadedBaseClass):
 
-def generatePermutationsThreaded(input_list: list, output_list = None, perm_size : int = None):
-    if output_list is None:
-        output_list = []
+    def __init__(self, input_list: list, output_list = None, perm_size : int = None, *args, **kwargs):
+        super().__init__(input_list, output_list, perm_size, *args, **kwargs)
 
-    if not input_list:
-        raise CalculatedPermutationsException("Empty input list")
-    
-    if len(input_list) > 11:
-        raise ExceededPermittedPermutationCountException("Input list too large for threaded permutations")
-    
-    if perm_size is None:
-        perm_size = len(input_list)
+    def performPermutationGeneration(self) -> list:
+        if self.perm_size == 1:
+            return self.output_list
 
-    if perm_size == 1:
-        output_list.append(input_list.copy())
-        return output_list
+        for data in self.data_for_threading:
+            thread = HeapNonRecursivePermutationsThread(data[0], data[1], self.char_only, self.digit_only)
+            self.threads.append(thread)
 
-    data_for_threading = []
+        for thread in self.threads:
+            thread.start()
 
-    for index, _ in enumerate(input_list):
-        list_copy = input_list.copy()
-        prefix = list_copy.pop(index)
-        data_for_threading.append((list_copy, prefix))
+        for thread in self.threads:
+            thread.join()
+            self.output_list.extend(thread.result)
 
-    threads = []
+        self.threads = []
 
-    for data in data_for_threading:
-        thread = ThreadedHeapNonRecursivePermutations(data[0], data[1])
-        threads.append(thread)
-
-    for thread in threads:
-        thread.start()
-
-    for thread in threads:
-        thread.join()
-        output_list.extend(thread.result)
-
-    threads = []
-
-    return output_list
+        return self.output_list

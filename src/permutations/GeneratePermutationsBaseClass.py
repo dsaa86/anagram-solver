@@ -1,15 +1,30 @@
 from CalculatedPermutationsException import CalculatedPermutationsException, ExceededPermittedPermutationCountException
 
 from HelperFunctions import checkInputListCharValidity
-from GeneratePermutationsBaseClass import GeneratePermutationsBaseClass
 
-class PermutationsThreadedBaseClass(GeneratePermutationsBaseClass):
-    def __init__(self, input_list: list, output_list = None, perm_size : int = None, *args, **kwargs):
-        super().__init__(input_list, output_list, perm_size, *args, **kwargs)
+class GeneratePermutationsBaseClass:
+    def __init__(self, input_list: list, output_list = None, perm_size : int = None, max_perm_size: int = 11, *args, **kwargs):
+        self.output_list = self.initiateOutputList(output_list)
         
-        if self.perm_size > 1:
-            self.data_for_threading = self.initiateDataForThreading(self.input_list)
-            self.threads = []
+        try:
+            self.input_list = self.initiateInputList(input_list, max_perm_size)
+        except CalculatedPermutationsException as e:
+            raise CalculatedPermutationsException("Empty input list") from e
+        except ExceededPermittedPermutationCountException as e:
+            raise ExceededPermittedPermutationCountException("Input list too large for threaded permutations") from e
+        
+        self.perm_size = self.initiatePermSize(perm_size, self.input_list)
+
+        try:
+            self.char_only, self.digit_only, self.spec_char_presence = self.testInputValidity(self.input_list)
+        except ValueError as e:
+            raise ValueError(e) from e
+        
+        if self.perm_size == 1:
+            if self.char_only:
+                self.output_list = self.input_list.copy()
+            else:
+                self.output_list.append(self.input_list.copy())
         
 
     def initiateOutputList(self, output_list):
@@ -17,10 +32,10 @@ class PermutationsThreadedBaseClass(GeneratePermutationsBaseClass):
             output_list = []
         return output_list
     
-    def initiateInputList(self, input_list):
+    def initiateInputList(self, input_list, max_perm_size):
         if not input_list:
             raise CalculatedPermutationsException("Empty input list")
-        if len(input_list) > 11:
+        if len(input_list) > max_perm_size:
             raise ExceededPermittedPermutationCountException("Input list too large for threaded permutations")
 
         for index, elem in enumerate(input_list):
@@ -44,14 +59,3 @@ class PermutationsThreadedBaseClass(GeneratePermutationsBaseClass):
             raise ValueError("Input list can only contain one data type: char OR int, not both")
         
         return char_only, digit_only, spec_char_presence
-    
-    def initiateDataForThreading(self, input_list):
-        
-        data_for_threading = []
-
-        for index, _ in enumerate(input_list):
-            list_copy = input_list.copy()
-            prefix = list_copy.pop(index)
-            data_for_threading.append((list_copy, prefix))
-
-        return data_for_threading
