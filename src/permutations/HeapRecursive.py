@@ -1,48 +1,37 @@
-from imaplib import Int2AP
-from operator import indexOf
+from GeneratePermutationsBaseClass import GeneratePermutationsBaseClass
 
-from CalculatedPermutationsException import CalculatedPermutationsException, ExceededPermittedPermutationCountException
-from HelperFunctions import checkInputListCharValidity
+class GeneratePermutationsHeapRecursive(GeneratePermutationsBaseClass):
+    def __init__(self, input_list: list, output_list = None, perm_size : int = None, threaded: bool = False, *args, **kwargs):
+        super().__init__(input_list, output_list, perm_size, *args, **kwargs)
+        self.threaded = threaded
 
-def heapRecursive(input_list: list, output_list = None, perm_size : int = None, threaded: bool = False):
-    
-    if output_list is None:
-        output_list = []
-    
-    if not input_list:
-        raise CalculatedPermutationsException("Empty input list")
-    
-    if len(input_list) > 7 and not threaded:
-        raise ExceededPermittedPermutationCountException()
-    
-    char_only, digit_only, spec_char_presence = checkInputListCharValidity(input_list)
+    def performPermutationGeneration(self):
 
-    if spec_char_presence:
-        raise ValueError("Special characters not permitted in input list")
-    
-    if char_only and digit_only:
-        raise ValueError("Input list can only contain one data type: char OR int, not both")
-    
-    if perm_size is None:
-        perm_size = len(input_list)
+        if self.perm_size == 1:
+            return self.output_list
 
-    if perm_size == 1:
-        output_list.append(input_list.copy())
-        return output_list
+        # we copy the input_list and output_list to avoid pass-by-reference issues
+        return self.heapRecursive(self.input_list.copy(), self.output_list.copy(), self.perm_size, self.threaded)
     
-    heapRecursive(input_list, output_list, perm_size - 1, threaded)
+    def heapRecursive(self, input_list, output_list, perm_size, threaded):
 
-    for i in range(perm_size - 1):
-        if perm_size % 2 == 0:
-            input_list[i], input_list[perm_size - 1] = input_list[perm_size - 1], input_list[i]
-        else:
-            input_list[0], input_list[perm_size - 1] = input_list[perm_size - 1], input_list[0]
+        if perm_size == 1:
+            output_list.append(input_list.copy())
+            return
         
-        heapRecursive(input_list, output_list, perm_size - 1, threaded)
+        self.heapRecursive(input_list, output_list, perm_size-1, threaded)
 
-    if not threaded:
-        for index, elem in enumerate(output_list):
-            output_list[index] = "".join(elem)
+        for i in range(perm_size - 1):
+            if perm_size % 2 == 0:
+                input_list[i], input_list[perm_size - 1] = input_list[perm_size - 1], input_list[i]
+            else:
+                input_list[0], input_list[perm_size - 1] = input_list[perm_size - 1], input_list[0]
+
+            self.heapRecursive(input_list, output_list, perm_size-1, threaded)
+
+        if self.char_only:
+            for index, elem in enumerate(output_list):
+                output_list[index] = "".join(elem)
+
+
         return output_list
-    
-    return output_list

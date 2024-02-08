@@ -4,19 +4,19 @@ from HelperFunctions import checkInputListCharValidity
 
 class GeneratePermutationsBaseClass:
     def __init__(self, input_list: list, output_list = None, perm_size : int = None, max_perm_size: int = 11, *args, **kwargs):
-        self.output_list = self.initiateOutputList(output_list)
+        self.output_list = self._initiateOutputList(output_list)
         
         try:
-            self.input_list = self.initiateInputList(input_list, max_perm_size)
+            self.input_list = self._initiateInputList(input_list, max_perm_size)
         except CalculatedPermutationsException as e:
             raise CalculatedPermutationsException("Empty input list") from e
         except ExceededPermittedPermutationCountException as e:
             raise ExceededPermittedPermutationCountException("Input list too large for threaded permutations") from e
         
-        self.perm_size = self.initiatePermSize(perm_size, self.input_list)
+        self.perm_size = self._initiatePermSize(perm_size, self.input_list)
 
         try:
-            self.char_only, self.digit_only, self.spec_char_presence = self.testInputValidity(self.input_list)
+            self.char_only, self.digit_only, self.spec_char_presence = self._testInputValidity(self.input_list)
         except ValueError as e:
             raise ValueError(e) from e
         
@@ -27,12 +27,12 @@ class GeneratePermutationsBaseClass:
                 self.output_list.append(self.input_list.copy())
         
 
-    def initiateOutputList(self, output_list):
+    def _initiateOutputList(self, output_list):
         if output_list is None:
             output_list = []
         return output_list
     
-    def initiateInputList(self, input_list, max_perm_size):
+    def _initiateInputList(self, input_list, max_perm_size):
         if not input_list:
             raise CalculatedPermutationsException("Empty input list")
         if len(input_list) > max_perm_size:
@@ -44,12 +44,12 @@ class GeneratePermutationsBaseClass:
 
         return input_list
     
-    def initiatePermSize(self, perm_size, input_list):
+    def _initiatePermSize(self, perm_size, input_list):
         if perm_size is None:
             perm_size = len(input_list)
         return perm_size
     
-    def testInputValidity(self, input_list):
+    def _testInputValidity(self, input_list):
         char_only, digit_only, spec_char_presence = checkInputListCharValidity(input_list)
 
         if spec_char_presence:
