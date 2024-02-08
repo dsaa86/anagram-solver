@@ -5,27 +5,22 @@ from HelperFunctions import checkInputListCharValidity
 class GeneratePermutationsBaseClass:
     def __init__(self, input_list: list, output_list = None, perm_size : int = None, max_perm_size: int = 11, *args, **kwargs):
         self.output_list = self._initiateOutputList(output_list)
-        
         try:
             self.input_list = self._initiateInputList(input_list, max_perm_size)
         except CalculatedPermutationsException as e:
             raise CalculatedPermutationsException("Empty input list") from e
         except ExceededPermittedPermutationCountException as e:
             raise ExceededPermittedPermutationCountException("Input list too large for threaded permutations") from e
-        
         self.perm_size = self._initiatePermSize(perm_size, self.input_list)
-
         try:
             self.char_only, self.digit_only, self.spec_char_presence = self._testInputValidity(self.input_list)
         except ValueError as e:
             raise ValueError(e) from e
-        
         if self.perm_size == 1:
             if self.char_only:
                 self.output_list = self.input_list.copy()
             else:
                 self.output_list.append(self.input_list.copy())
-        
 
     def _initiateOutputList(self, output_list):
         if output_list is None:
