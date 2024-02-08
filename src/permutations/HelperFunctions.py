@@ -21,10 +21,8 @@ def checkInputListCharValidity(input_list:list) -> bool:
         if re.search(r'[^a-z]', x) is None:
             char_only = True
         elif re.search(r'[^0-9]', x) is None:
-            print("digit only")
             digit_only = True
         elif re.search(r'[^a-z0-9]', x) is not None:
-            print("spec char")
             spec_char_presence = True
 
     return char_only, digit_only, spec_char_presence

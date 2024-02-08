@@ -128,12 +128,3 @@ def heapNonRecursive(input_list: list, output_list: list = None, perm_size : int
         output_list.append(int_mapped_input_list)
 
     return output_list
-
-
-data = ["a", "b", "c", "d", "e", "f", "/"]
-results = heapNonRecursive(data)
-
-for result in results:
-    print(result)
-
-print(len(results))

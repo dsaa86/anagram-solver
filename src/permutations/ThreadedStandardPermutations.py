@@ -1,5 +1,6 @@
 from CalculatedPermutationsException import CalculatedPermutationsException, ExceededPermittedPermutationCountException
-import ThreadedStandardPermutations
+from ThreadedPermutationsClass import StandardPermutationsThread
+from HelperFunctions import checkInputListCharValidity
 
 """
 
@@ -40,7 +41,7 @@ import ThreadedStandardPermutations
 """
 
 
-def generatePermutationsThreaded(input_list: list, output_list = None, perm_size : int = None):
+def generateStandardPermutationsThreaded(input_list: list, output_list = None, perm_size : int = None):
     if output_list is None:
         output_list = []
 
@@ -52,6 +53,18 @@ def generatePermutationsThreaded(input_list: list, output_list = None, perm_size
     
     if perm_size is None:
         perm_size = len(input_list)
+
+    for index, elem in enumerate(input_list):
+        if type(elem) == str:
+            input_list[index] = elem.lower()
+
+    char_only, digit_only, spec_char_presence = checkInputListCharValidity(input_list)
+
+    if spec_char_presence:
+        raise ValueError("Special characters not permitted in input list")
+    
+    if char_only and digit_only:
+        raise ValueError("Input list can only contain one data type: char OR int, not both")
 
     if perm_size == 1:
         output_list.append(input_list.copy())
@@ -67,7 +80,7 @@ def generatePermutationsThreaded(input_list: list, output_list = None, perm_size
     threads = []
 
     for data in data_for_threading:
-        thread = ThreadedStandardPermutations(data[0], data[1])
+        thread = StandardPermutationsThread(data[0], data[1], char_only, digit_only)
         threads.append(thread)
 
     for thread in threads:
