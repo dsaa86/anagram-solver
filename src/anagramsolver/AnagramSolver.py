@@ -7,7 +7,7 @@ sys.path.append(f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/
 
 import HeapRecursive
 import RetrieveFromLocalDict
-from HelperFunctions import (countIndividualLettersInAnagram,
+from AnagramSolverHelperFunctions import (countIndividualLettersInAnagram,
                              getUniqueLettersInAnagram, preparePattern,
                              sanitiseAnagramString, splitAnagramToList)
 
