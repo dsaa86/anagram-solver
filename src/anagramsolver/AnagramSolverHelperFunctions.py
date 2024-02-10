@@ -1,6 +1,3 @@
-import re
-from multiprocessing.spawn import prepare
-
 def countIndividualLettersInAnagram(anagram: str) -> int:
     """
         To account for duplicate chars when building
