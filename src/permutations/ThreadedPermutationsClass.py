@@ -1,8 +1,8 @@
 from threading import Thread
 from itertools import permutations
 from unittest import result
-# from HeapRecursive import heapRecursive
-# from HeapNonRecursive import heapNonRecursive
+from HeapNonRecursive import GeneratePermutationsHeapNonRecursive
+from HeapRecursive  import GeneratePermutationsHeapRecursive
 from FactorialDecomposition import GeneratePermutationsFactorialDecomposition
 
 
@@ -46,8 +46,9 @@ class HeapRecursivePermutationsThread(ThreadedPermutations):
         ThreadedPermutations.__init__(self, data_set, prefix, char_only, digit_only)
 
     def run(self):
-        permutations_list = heapRecursive(self.data_set, threaded = True)
-        self.result = self.construct_results(permutations_list)
+        generator = GeneratePermutationsHeapRecursive(self.data_set, threaded = True)
+        self.result = generator.performPermutationGeneration()
+        self.result = self.construct_results(self.result)
 
 
 class HeapNonRecursivePermutationsThread(ThreadedPermutations):
@@ -55,8 +56,9 @@ class HeapNonRecursivePermutationsThread(ThreadedPermutations):
         ThreadedPermutations.__init__(self, data_set, prefix, char_only, digit_only)
 
     def run(self):
-        permutations_list = heapNonRecursive(self.data_set, threaded = True)
-        self.result = self.construct_results(permutations_list)
+        generator = GeneratePermutationsHeapNonRecursive(self.data_set, threaded = True)
+        self.result = generator.performPermutationGeneration()
+        self.result = self.construct_results(self.result)
 
 class FactorialDecompositionPermutationsThread(ThreadedPermutations):
     def __init__(self, data_set: list, char_only: bool, digit_only: bool, index_range: tuple):

@@ -49,3 +49,9 @@ class GeneratePermutationsFactorialDecomposition(GeneratePermutationsBaseClass):
             return ["".join(x) for x in output_list]
         elif self.digit_only:
             return [[int(x) for x in y] for y in output_list]
+        
+# generator = GeneratePermutationsFactorialDecomposition(["l", "a", "u", "r", "a"], max_perm_size = 7)
+# # print(generator.performPermutationGeneration())
+# print(len(generator.performPermutationGeneration()))
+# print(set(generator.performPermutationGeneration()))
+# print(len(set(generator.performPermutationGeneration())))

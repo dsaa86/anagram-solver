@@ -74,7 +74,7 @@ class PermutationsThreadedFactorialDecompositionClass(PermutationsThreadedBaseCl
 
 
 
-    def performThreadedPermutationGeneration(self) -> list:
+    def performPermutationGeneration(self) -> list:
         if self.perm_size == 1:
             return self.output_list
 

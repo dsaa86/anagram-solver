@@ -1,9 +1,10 @@
 from GeneratePermutationsBaseClass import GeneratePermutationsBaseClass
+import copy
 
 class GeneratePermutationsHeapNonRecursive(GeneratePermutationsBaseClass):
 
-    def __init__(self, input_list: list, output_list = None, perm_size : int = None, *args, **kwargs):
-        super().__init__(input_list, output_list, perm_size, *args, **kwargs)
+    def __init__(self, input_list: list, output_list = None, perm_size : int = None, max_perm_size: int = 7, *args, **kwargs):
+        super().__init__(input_list, output_list, perm_size, max_perm_size = max_perm_size, *args, **kwargs)
         self.mapped_char_to_int = {
         "a" : 0,
         "b" : 1,
@@ -61,11 +62,13 @@ class GeneratePermutationsHeapNonRecursive(GeneratePermutationsBaseClass):
         24 : "y",
         25 : "z"
     }
-        
+
+
         if self.char_only:
-            self.output_list = ["".join(self.input_list)]
+            self.output_list = ["".join(self.input_list.copy())]
         else:
             self.output_list = [self.input_list.copy()]
+
 
     def performPermutationGeneration(self):
         return self.heapNonRecursive(self.input_list)
@@ -114,14 +117,8 @@ class GeneratePermutationsHeapNonRecursive(GeneratePermutationsBaseClass):
             for index, elem in enumerate(self.output_list):
                 int_only_list = all(type(int_value) == int for int_value in elem)
                 if int_only_list:
-                    self.output_list[index] = "".join([self.mapIntToChar(int_value) for int_value in elem])
+                    self.output_list[index] = [self.mapIntToChar(int_value) for int_value in elem]
+                    self.output_list[index] = "".join(self.output_list[index])
 
 
         return self.output_list
-
-
-input_list = [1, 2, 3]
-
-heap_non_recursive_permutations = GeneratePermutationsHeapNonRecursive(input_list)
-result = heap_non_recursive_permutations.performPermutationGeneration()
-print(result)

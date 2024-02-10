@@ -2,8 +2,12 @@ from CalculatedPermutationsException import CalculatedPermutationsException, Exc
 
 from HelperFunctions import checkInputListCharValidity
 
+import copy
+
 class GeneratePermutationsBaseClass:
+
     def __init__(self, input_list: list, output_list = None, perm_size : int = None, max_perm_size: int = 11, *args, **kwargs):
+
         self.output_list = self._initiateOutputList(output_list)
         try:
             self.input_list = self._initiateInputList(input_list, max_perm_size)
@@ -16,17 +20,20 @@ class GeneratePermutationsBaseClass:
             self.char_only, self.digit_only, self.spec_char_presence = self._testInputValidity(self.input_list)
         except ValueError as e:
             raise ValueError(e) from e
+
         if self.perm_size == 1:
             if self.char_only:
                 self.output_list = self.input_list.copy()
             else:
                 self.output_list.append(self.input_list.copy())
 
+
+
     def _initiateOutputList(self, output_list):
         if output_list is None:
             output_list = []
         return output_list
-    
+
     def _initiateInputList(self, input_list, max_perm_size):
         if not input_list:
             raise CalculatedPermutationsException("Empty input list")
