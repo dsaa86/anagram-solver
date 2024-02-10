@@ -17,3 +17,17 @@ def getUniqueLettersInAnagram(anagram) -> list:
 
 def splitAnagramToList(anagram) -> list:
     return list(anagram)
+
+def countLetterFrequencyInAnagram(anagram) -> dict:
+    if type(anagram) != list:
+        anagram = list(anagram)
+
+    frequency_count = {}
+
+    for char in anagram:
+        if char not in frequency_count:
+            frequency_count[char] = 1
+        else:
+            frequency_count[char] += 1
+
+    return frequency_count

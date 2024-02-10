@@ -13,7 +13,7 @@ def sanitiseAnagramString(anagram: str, pattern: str = r"[^a-z]+", err_msg: str 
     return anagram
 
 
-def preparePatternForMatching(pattern:str) -> str:
+def preparePartialPatternForMatching(pattern:str) -> str:
     
     if type(pattern) != str:
         raise TypeError("Pattern must be a string")
@@ -26,3 +26,14 @@ def preparePatternForMatching(pattern:str) -> str:
     prepared_pattern += r"$"
 
     return prepared_pattern
+
+
+def prepareLettersOnlyForMatching(anagram: list) -> str:
+    prepared_pattern = r"^["
+
+    for index, char in enumerate(anagram):
+        prepared_pattern += char
+        prepared_pattern += "|" if index < len(anagram) - 1 else f"]{{{len(anagram)}}}$"
+
+    return prepared_pattern
+
