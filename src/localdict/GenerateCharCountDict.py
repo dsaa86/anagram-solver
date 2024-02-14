@@ -61,6 +61,13 @@ class GenerateCharCountDict:
                 prepared_string += f"{letter}{char_count_dict[letter]} "
 
         return prepared_string
+    
+    def convertCharCountToTupleForLookup(self, char_count: str) -> tuple:
+        char_count_as_list = char_count.split(" ")
+        char_count_as_list.pop()
+        # print(char_count_as_list)
+        return tuple(char_count_as_list)
+
 
 
     def generateCharCountDict(self, local_dict) ->  dict:
@@ -104,8 +111,3 @@ class GenerateCharCountDict:
             converted_dict[key_tuple] = value
         
         return converted_dict
-
-char_count_dict = GenerateCharCountDict(generate = True, read = True)
-
-for key, value in char_count_dict.char_count_dict.items():
-    print(f"{key} : {value}")

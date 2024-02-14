@@ -1,0 +1,2 @@
+DB Username = daefa8f0e79d116a5c88efae5429385647fbfe916f6c9764845358187b41db1
+DB Password = 236ee49eafec34beff73bf82ae7e1166ba802335f52b23fbcf98a64dfd6d69ca

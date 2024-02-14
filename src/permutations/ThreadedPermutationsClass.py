@@ -1,6 +1,5 @@
 from threading import Thread
 from itertools import permutations
-from unittest import result
 from HeapNonRecursive import GeneratePermutationsHeapNonRecursive
 from HeapRecursive  import GeneratePermutationsHeapRecursive
 from FactorialDecomposition import GeneratePermutationsFactorialDecomposition

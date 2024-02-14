@@ -37,7 +37,7 @@ class PermutationsManager:
         if type(anagram) not in [list, str, int]:
             raise TypeError("Input is not of type str, int, or list")
 
-        if len(anagram) > max_perm_size:
+        if len(anagram) > max_perm_size+1:
             raise ValueError(f"Anagram must be no longer than {max_perm_size} characters")
 
         if type(anagram) is not list:

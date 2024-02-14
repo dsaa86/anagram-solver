@@ -1,4 +1,5 @@
 import regex
+import re
 
 def sanitiseAnagramString(anagram: str, pattern: str = r"[^a-z]+", err_msg: str = "Anagram must only contain letters (a-z, A-Z)") -> str:
     if type(anagram) != str:

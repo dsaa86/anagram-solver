@@ -23,14 +23,15 @@ def makeRequest(pattern: str, anagram:str = None):
     return response.json()
 
 
-def trimNonMatchingResponses(anagram: str, data_set: list):
-    anagram_list = list(anagram)
+def trimNonMatchingResponses(anagram, data_set: list):
+    anagram_list = anagram
+    if type(anagram) == str:
+        anagram_list = list(anagram)
     valid_responses = []
 
     anagram_char_count = countLetterFrequencyInAnagram(anagram_list)
 
     for word in data_set:
-
         if set(list(word)) != set(anagram_list):
             continue
         word_char_count = countLetterFrequencyInAnagram(list(word))
@@ -41,4 +42,6 @@ def trimNonMatchingResponses(anagram: str, data_set: list):
     return valid_responses
 
 
-print(hashlib.sha256(f"{time.time()}hello".encode()).hexdigest())
+
+
+# print(hashlib.sha256(f"{time.time()}complexpasscode".encode()).hexdigest())
