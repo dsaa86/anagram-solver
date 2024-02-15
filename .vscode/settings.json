@@ -1,0 +1,10 @@
+{
+    "prettier.documentSelectors": [
+        "py",
+        "js",
+        "css",
+        "scss",
+        "html",
+        "ts"
+    ]
+}

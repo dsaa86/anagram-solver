@@ -1,4 +1,6 @@
-import os, sys
+import os, sys, json, requests, time, hashlib
+
+from matplotlib.pylab import permutation
 
 sys.path.append(f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/permutations/")
 sys.path.append(f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/localdict/")
@@ -94,10 +96,10 @@ class InterfacePermutationManager:
             checkbox[0].set(False)
 
     def setDefaultPermutationResponseOutput(self):
-        self.permutation_response_output__valid_permutations.set("No permutations generated")
-        self.permutation_response_output__valid_permutations_matches.set("No matches found")
-        self.permutation_response_output__valid_hashes.set("No hashes generated")
-        self.permutation_response_output__valid_api_responses.set("No API responses generated")
+        self.setPermutationResponseOutput("valid_permutations", "No permutations generated")
+        self.setPermutationResponseOutput("valid_permutations_matches", "No matches found")
+        self.setPermutationResponseOutput("valid_hashes", "No hashes generated")
+        self.setPermutationResponseOutput("valid_api_responses", "No API responses generated")
 
     def setPermutationResponseOutput(self, response_type, response):
 
@@ -164,29 +166,47 @@ class InterfacePermutationManager:
         return threads
 
 
-    def extractPermutationsResultsFromOutput(self, output) -> bool:
-        success = False
+    def extractResultsFromOutput(self, output, perm_type) -> bool:
+        permutation_output_destination = {
+            "permutations": "valid_permutations",
+            "permutations_matches": "valid_permutations_matches",
+            "hashmap": "valid_hashes",
+            "api": "valid_api_responses"
+        }
 
         for result in output:
-            # The results MAY have all hash and API results as well as permutations
-            if result["type"] == "permutations":
-                try:
-                    permutation_output = self.stringifyPermutationsOutput(result)
-                    self.setPermutationResponseOutput("valid_permutations", permutation_output)
-                except Exception:
-                    self.setPermutationsResponseOutput("valid_permutations", "No valid permutations generated")
+            # We are searching for a specific type of permutation; move to the next result if this is not a matching type
+            if result["type"] != perm_type:
+                continue
+            try:
+                permutation_output = self.getOutputFromPermutationResults(result, perm_type)
 
-                local_dict_results = self.searchLocalDictForMatchingPermutations(result)
+                self.setPermutationResponseOutput(permutation_output_destination[perm_type], permutation_output)
+            except Exception:
+                self.setPermutationResponseOutput(permutation_output_destination[perm_type], "No valid permutations generated")
 
-                if len(local_dict_results) > 0:
-                    local_dict_results_as_string = self.joinListOfStrings(local_dict_results)
-                    self.setPermutationResponseOutput("valid_permutations_matches", local_dict_results_as_string)
-                else:
-                    valid_permutations_matches.set("No matches found")
-                success = True
-                break
+            if perm_type == "permutations":
+                local_dict_result_string = self.searchLocalDictForMatchingPermutationsAndReturnAsString(result)
 
-        return success
+                self.setPermutationResponseOutput(permutation_output_destination["permutations_matches"], local_dict_result_string)
+            return True
+        return False
+    
+    
+    def getOutputFromPermutationResults(self, result, perm_type):
+            if perm_type == "hashmap":
+                return result["results"]["results"]
+            elif perm_type == "api":
+                return result["results"]
+            elif perm_type == "permutations":
+                return self.stringifyPermutationsOutput(result)
+    
+
+    def searchLocalDictForMatchingPermutationsAndReturnAsString(self, result) -> str:
+        local_dict_results = self.searchLocalDictForMatchingPermutations(result)
+        if len(local_dict_results) == 0:
+            return "No matches found"
+        return self.joinListOfStrings(local_dict_results)
     
 
     def stringifyPermutationsOutput(self, result) -> str:
@@ -203,48 +223,46 @@ class InterfacePermutationManager:
     def searchLocalDictForMatchingPermutations(self, result) -> list:
         local_dict = RetrieveFromLocalDict(f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/localdict/")
         return [ permutation for permutation in result["results"]["permutations"] if local_dict.retrieveFromLocalDict(permutation) ]
+    
 
-
-    def extractHashResultsFromOutput(self, output) -> bool:
-        success = False
-        for result in output:
-            if result["type"] == "hashmap":
-                hashmap_results = result["results"]["results"]
-                valid_hashes.set(hashmap_results)
-                success = True
-                break
-        return success
-
-
-    def extractApiResultsFromOutput(self, output) -> bool:
-        success = False
-        for result in output:
-            if result["type"] == "api":
-                api_results = result["results"]
-                valid_api_responses.set(api_results)
-                success = True
-                break
-
-        return success
-
-
-    def uploadOutputToServer(self, output):
+    def gatherDataForUploadToServer(self, output):
         keys = []
         data_set = []
         for result in output:
             if result["type"] in ["permutations", "hashmap"]:
-                hashed_key = ""
-                if result["type"] == "permutations":
-                    str_input = "".join(result['results']['input'])
-                    hashed_key_string = (f"Time:{time.time()}Input:{str_input}Type:{result['algorithm']}")
-                    hashed_key = hashlib.sha256(hashed_key_string.encode()).hexdigest()
-                else:
-                    hashed_key_string = (f"Time:{time.time()}Type:{result['type']}")
-                    hashed_key = hashlib.sha256(hashed_key_string.encode()).hexdigest()
-
+                hashed_key = self.generateHashKeyForDynamoUpload(result)
                 keys.append(hashed_key)
+                data = self.generateUploadDataSet(result, hashed_key)
+                data_set.append(data)
+        
+            raise ValueError("Number of keys provided does not match number of values.") if len(keys) != len(data_set) else None
+        
+        # The AWS lambda function iterates over the data by enumerating the "keys" list in the request_data dict
+        request_data = {
+            "keys" : keys,
+        }
+        # We also use the enumeration locally to add the data to the dict in the correct order
+        for index, key in enumerate(keys):
+            request_data[key] = data_set[index]
 
-                data = {
+        return self.uploadOutputToServer(request_data)
+
+
+    def uploadOutputToServer(self, request_data):
+        headers = {"Content-Type": "application/json"}
+        data = json.dumps(request_data)
+        url = "https://wxu8uvavv0.execute-api.us-west-2.amazonaws.com/anagram_solver-dev/permutations/add"
+
+        return requests.post(url, headers=headers, data=data)
+
+
+    def generateHashKeyForDynamoUpload(self, result):
+        hashed_key_string = f"Time:{time.time()}Type:{result['type']}"
+        return hashlib.sha256(hashed_key_string.encode()).hexdigest()
+    
+
+    def generateUploadDataSet(self, result, hashed_key):
+        return {
                     "ID" : hashed_key,
                     "Sort": result["algorithm"],
                     "type" : result["results"]["type"],
@@ -255,62 +273,50 @@ class InterfacePermutationManager:
                     "run_time": str(result["results"]["run_time"])
                 }
 
-                data_set.append(data)
+
+
+    # WARN: THIS ALL NEEDS TO BE DIRECTLY IN THE UI
+
+
+    # def startGeneration(self):
+
+    #     # All checkboxes are unchecked - display error to user
+    #     if self.checkIfAllPermutationOptionsInCheckboxManagerAreIdentical() == [True, False]:
+    #         raise ValueError("No permutation types selected")
+
+    #     # Lock all checkboxes and input
+
+    #     # Perform generation
+
+    #     # Output
+
+    #     # Reset
+
+    #     # Unlock all checkboxes and input
+
+
+
+    #     resetResponseOutput()
+
+    #     anagram = anagram_input.get()
+
+    #     selected_permutation_types = extractSelectedPermutationTypes()
         
-        if len(keys) != len(data_set):
-            return{
-                'statusCode': 400,
-                'body': json.dumps('Number of keys provided does not match number of values.')
-            }
-        
-        request_data = {
-            "keys" : keys,
-        }
+    #     threads = generateThreads(selected_permutation_types, anagram)
+    #     startThreads(threads)
+    #     output = [thread.results for thread in threads]
+    #     threads = []
+    #     # for thread in threads:
+    #     #     # thread.join()
+    #     #     output.append(thread.results)
 
-        for index, key in enumerate(keys):
-            request_data[key] = data_set[index]
+    #     successful_permutation_extraction = extractPermutationsResultsFromOutput(output)
+    #     successful_hash_extraction = extractHashResultsFromOutput(output)
+    #     successful_api_extraction = extractApiResultsFromOutput(output)
 
-        headers = {"Content-Type": "application/json"}
-        data = json.dumps(request_data)
-        url = "https://wxu8uvavv0.execute-api.us-west-2.amazonaws.com/anagram_solver-dev/permutations/add"
+    #     uploadOutputToServer(output)
 
-        response = requests.post(url, headers=headers, data=data)
-
-
-
-    def startGeneration(self):
-
-        resetResponseOutput()
-
-        anagram = anagram_input.get()
-
-        selected_permutation_types = extractSelectedPermutationTypes()
-        
-        threads = generateThreads(selected_permutation_types, anagram)
-        startThreads(threads)
-        output = [thread.results for thread in threads]
-        threads = []
-        # for thread in threads:
-        #     # thread.join()
-        #     output.append(thread.results)
-
-        successful_permutation_extraction = extractPermutationsResultsFromOutput(output)
-        successful_hash_extraction = extractHashResultsFromOutput(output)
-        successful_api_extraction = extractApiResultsFromOutput(output)
-
-        uploadOutputToServer(output)
-
-        resetCheckboxes()
-
-
-
-
-
-
-
-
-
-
+    #     resetCheckboxes()
 
 response = ["valid_permutations", "valid_permutations_matches", "valid_hashes", "valid_api_responses"]
 empty_response = []
