@@ -1,19 +1,16 @@
 import os, sys, json, requests, time, hashlib
 
-from matplotlib.pylab import permutation
-
-sys.path.append(f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/permutations/")
+# sys.path.append(f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/permutations/")
 sys.path.append(f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/localdict/")
 
 import tkinter as tk
-from tkinter import *
-from tkinter import ttk
+from tkinter import BooleanVar, StringVar
 
 from PermutationsManagerThread import PermutationsManagerThread
 from HashmapLookupThread import HashmapLookupThread
 from APIRequestThread import APIRequestThread
 
-from PermutationsManager import PermutationsManager
+# from PermutationsManager import PermutationsManager
 from RetrieveFromLocalDict  import RetrieveFromLocalDict
 
 class InterfacePermutationManager:
@@ -67,6 +64,10 @@ class InterfacePermutationManager:
 
         self.setDefaultPermutationResponseOutput()
 
+    
+    def getCheckboxCollectionManager(self):
+        return self.checkbox_collection_manager
+
     def joinListOfStrings(self, list_of_strings):
         return ", ".join(list_of_strings)
 
@@ -95,11 +96,13 @@ class InterfacePermutationManager:
         for checkbox in self.checkbox_collection_manager:
             checkbox[0].set(False)
 
+
     def setDefaultPermutationResponseOutput(self):
         self.setPermutationResponseOutput("valid_permutations", "No permutations generated")
         self.setPermutationResponseOutput("valid_permutations_matches", "No matches found")
         self.setPermutationResponseOutput("valid_hashes", "No hashes generated")
         self.setPermutationResponseOutput("valid_api_responses", "No API responses generated")
+
 
     def setPermutationResponseOutput(self, response_type, response):
 
@@ -275,50 +278,45 @@ class InterfacePermutationManager:
 
 
 
-    # WARN: THIS ALL NEEDS TO BE DIRECTLY IN THE UI
+# WARN: THIS ALL NEEDS TO BE DIRECTLY IN THE UI
 
 
-    # def startGeneration(self):
+# def startGeneration(self):
 
-    #     # All checkboxes are unchecked - display error to user
-    #     if self.checkIfAllPermutationOptionsInCheckboxManagerAreIdentical() == [True, False]:
-    #         raise ValueError("No permutation types selected")
+#     # All checkboxes are unchecked - display error to user
+#     if self.checkIfAllPermutationOptionsInCheckboxManagerAreIdentical() == [True, False]:
+#         raise ValueError("No permutation types selected")
 
-    #     # Lock all checkboxes and input
+#     # Lock all checkboxes and input
 
-    #     # Perform generation
+#     # Perform generation
 
-    #     # Output
+#     # Output
 
-    #     # Reset
+#     # Reset
 
-    #     # Unlock all checkboxes and input
+#     # Unlock all checkboxes and input
 
 
 
-    #     resetResponseOutput()
+#     resetResponseOutput()
 
-    #     anagram = anagram_input.get()
+#     anagram = anagram_input.get()
 
-    #     selected_permutation_types = extractSelectedPermutationTypes()
-        
-    #     threads = generateThreads(selected_permutation_types, anagram)
-    #     startThreads(threads)
-    #     output = [thread.results for thread in threads]
-    #     threads = []
-    #     # for thread in threads:
-    #     #     # thread.join()
-    #     #     output.append(thread.results)
+#     selected_permutation_types = extractSelectedPermutationTypes()
 
-    #     successful_permutation_extraction = extractPermutationsResultsFromOutput(output)
-    #     successful_hash_extraction = extractHashResultsFromOutput(output)
-    #     successful_api_extraction = extractApiResultsFromOutput(output)
+#     threads = generateThreads(selected_permutation_types, anagram)
+#     startThreads(threads)
+#     output = [thread.results for thread in threads]
+#     threads = []
+#     # for thread in threads:
+#     #     # thread.join()
+#     #     output.append(thread.results)
 
-    #     uploadOutputToServer(output)
+#     successful_permutation_extraction = extractPermutationsResultsFromOutput(output)
+#     successful_hash_extraction = extractHashResultsFromOutput(output)
+#     successful_api_extraction = extractApiResultsFromOutput(output)
 
-    #     resetCheckboxes()
+#     uploadOutputToServer(output)
 
-response = ["valid_permutations", "valid_permutations_matches", "valid_hashes", "valid_api_responses"]
-empty_response = []
-
-print("".join(empty_response))
+#     resetCheckboxes()
